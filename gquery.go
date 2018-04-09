@@ -1,5 +1,7 @@
 package gquery
 
+// @TODO: work on building this out as we need it and get it connected to the db all as 1 nice package.
+
 import (
   "encoding/json"
   "strconv"
