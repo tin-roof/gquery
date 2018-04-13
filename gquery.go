@@ -21,6 +21,7 @@ type Query struct {
   OrderString string // order by clause of the query
   GroupString string // group claus of the query
   LimitNumber int // limit of results requested
+  ReturningString string // returning query
   Params []interface{} // params used for the query
 }
 
@@ -199,6 +200,21 @@ func (q *Query) Insert(args ...interface{}) *Query {
   return q
 }
 
+// build the returning string
+func (q *Query) Returning(args ...interface{}) *Query {
+  for index, element := range args {
+    // add the comma for anything after the first element
+    if index != 0 {
+      q.ReturningString += ", "
+    }
+
+    // add the item to the string
+    q.ReturningString += element.(string)
+  }
+
+  return q
+}
+
 // build the full query string
 func (q *Query) build(qType int) {
   var query string
@@ -243,6 +259,11 @@ func (q *Query) build(qType int) {
     query += " LIMIT " + strconv.Itoa(q.LimitNumber)
   }
 
+  // add order by clause
+  if q.ReturningString != "" {
+    query += " RETURNING " + q.ReturningString
+  }
+
   query += ";"
 
   q.QueryString = query
@@ -258,7 +279,7 @@ func (q *Query) View() []byte {
 	data, err := json.Marshal(q)
 
 	if err != nil {
-		return []byte("nothing here")
+    return []byte("nothing here")
 	}
 
   return data;
