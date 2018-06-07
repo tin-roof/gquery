@@ -31,12 +31,18 @@ func Init(args ...string) *Query {
   q := new(Query)
 
   // set the db type
-  switch args[1] {
-    case "postgres":
-      q.DbType = 1
-      q.PGPC = 1
-    default: // mysql
-      q.DbType = 0
+  if len(args) == 2 {
+    switch args[1] {
+      case "pg":
+        fallthrough
+      case "postgres":
+        q.DbType = 1
+        q.PGPC = 1
+      default: // mysql
+        q.DbType = 0
+    }
+  } else {
+    q.DbType = 0
   }
 
   q.Table = args[0]
