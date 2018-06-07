@@ -8,6 +8,7 @@ import (
 )
 
 type Query struct {
+  DbType int // which type of db
   Table string // table we are querying
   QueryString string // full query to run
   SelectString string // string containing the columsn to select
@@ -23,12 +24,22 @@ type Query struct {
   LimitNumber int // limit of results requested
   ReturningString string // returning query
   Params []interface{} // params used for the query
+  PGPC int // number of parameters to count for POSTGRES $1, $2 type placeholders
 }
 
-func Init(table string) *Query {
+func Init(args ...string) *Query {
   q := new(Query)
 
-  q.Table = table
+  // set the db type
+  switch args[1] {
+    case "postgres":
+      q.DbType = 1
+      q.PGPC = 1
+    default: // mysql
+      q.DbType = 0
+  }
+
+  q.Table = args[0]
 
   return q
 }
@@ -83,7 +94,15 @@ func (q *Query) Where(args ...interface{}) *Query {
     if index == 0 || index == 1 {
       q.WhereString += element.(string) + " "
     } else {
-      q.WhereString += "?"
+
+      switch q.DbType {
+        case 1:
+          q.WhereString += "$" + strconv.Itoa(q.PGPC)
+          q.PGPC++
+        default:
+          q.WhereString += "?"
+      }
+
       q.WhereParams = append(q.WhereParams, element)
     }
   }
@@ -98,7 +117,15 @@ func (q *Query) Andwhere(args ...interface{}) *Query {
     if index == 0 || index == 1 {
       q.WhereString += element.(string) + " "
     } else {
-      q.WhereString += "?"
+
+      switch q.DbType {
+        case 1:
+          q.WhereString += "$" + strconv.Itoa(q.PGPC)
+          q.PGPC++
+        default:
+          q.WhereString += "?"
+      }
+
       q.WhereParams = append(q.WhereParams, element)
     }
   }
@@ -114,7 +141,15 @@ func (q *Query) Orwhere(args ...interface{}) *Query {
     if index == 0 || index == 1 {
       q.WhereString += element.(string) + " "
     } else {
-      q.WhereString += "?"
+
+      switch q.DbType {
+        case 1:
+          q.WhereString += "$" + strconv.Itoa(q.PGPC)
+          q.PGPC++
+        default:
+          q.WhereString += "?"
+      }
+
       q.WhereParams = append(q.WhereParams, element)
     }
   }
@@ -171,7 +206,15 @@ func (q *Query) Set(args ...interface{}) *Query {
     if index == 0 {
       q.SetString += element.(string)
     } else {
-      q.SetString += " = ?"
+
+      switch q.DbType {
+        case 1:
+          q.SetString += " = $" + strconv.Itoa(q.PGPC)
+          q.PGPC++
+        default:
+          q.SetString += " = ?"
+      }
+
       q.SetParams = append(q.SetParams, element)
     }
   }
@@ -193,7 +236,15 @@ func (q *Query) Insert(args ...interface{}) *Query {
       if q.ValueString != "" {
         q.ValueString += ", "
       }
-      q.ValueString += "?"
+
+      switch q.DbType {
+        case 1:
+          q.ValueString += "$" + strconv.Itoa(q.PGPC)
+          q.PGPC++
+        default:
+          q.ValueString += "?"
+      }
+
       q.InsertParams = append(q.InsertParams, element)
     }
   }
