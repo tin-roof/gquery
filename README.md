@@ -5,7 +5,7 @@ Eloquent esq query builder for Go
 To start using GQuery, install Go and run `go get`:
 
 ```sh
-$ go get -u github.com/warpinc/gquery
+$ go get -u github.com/tin-roof/gquery
 ```
 
 This will retrieve the library.
