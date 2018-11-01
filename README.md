@@ -16,7 +16,7 @@ Building your first query
 ```go
 package main
 
-import "github.com/warpinc/gquery"
+import "github.com/tin-roof/gquery"
 
 func main() {
   var query = query.Init("users") // query the users table
@@ -29,7 +29,7 @@ func main() {
 ```go
 package main
 
-import "github.com/warpinc/gquery"
+import "github.com/tin-roof/gquery"
 
 func main() {
   var query = query.Init("users", "postgres") // query the users table
